@@ -11,6 +11,29 @@ from django.shortcuts import render, redirect
 from django.core.mail import EmailMessage
 from django.core.exceptions import ValidationError
 import re
+from django.contrib.auth import authenticate, login, logout
+
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            messages.success(request, 'Login successful')
+
+            return redirect('students:home')  # Redirect to a success page or home
+        else:
+            messages.error(request, 'Invalid username or password')
+    
+    return render(request, 'auth/login.html')
+
+def logout_view(request):
+    logout(request)
+    return redirect('students:student_view')
+
 
 class StudentView(View):
     template_name = 'student/student.html'  # Update this to your template
@@ -88,3 +111,17 @@ def send_email_view(request):
         return redirect('students:student_view')
     
     return redirect('students:student_view')
+
+
+class AdminView(View):
+    template_name = 'dashboard/base.html'  # Update this to your template
+
+    def get(self, request):
+        return render(request, self.template_name)
+    
+class loginView(View):
+    template_name = 'auth/login.html'  # Update this to your template
+
+    def get(self, request):
+        return render(request, self.template_name)
+    
