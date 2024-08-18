@@ -1,8 +1,16 @@
+from distutils import config
+from email.message import EmailMessage
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views import View
 from django.contrib import messages
 from django.db import transaction
 from .models import Student
+
+
+from django.shortcuts import render, redirect
+from django.core.mail import EmailMessage
+from django.core.exceptions import ValidationError
+import re
 
 class StudentView(View):
     template_name = 'student/student.html'  # Update this to your template
@@ -55,3 +63,28 @@ class StudentView(View):
 
         # return render('students:student', self.template_name,)  # Redirect to the student list or appropriate page
         return redirect('students:student_view')
+
+
+
+
+
+def send_email_view(request):
+    if request.method == 'POST':
+        recipient_email = request.POST.get('recipient_email')
+        subject = request.POST.get('subject')
+        message = request.POST.get('message')
+        
+        try:
+            email = EmailMessage(
+                subject,
+                message,
+                'your-email@gmail.com',  # or use config('MAIL_FROM_ADDRESS')
+                [recipient_email],
+            )
+            email.send(fail_silently=False)
+            return redirect('email_sent')  # Redirect to a success page
+        except Exception as e:
+            messages.error(request, 'Error sending email. Please try again.')
+        return redirect('students:student_view')
+    
+    return redirect('students:student_view')

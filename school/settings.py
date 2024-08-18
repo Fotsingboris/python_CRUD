@@ -1,6 +1,7 @@
 
 import os
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -62,6 +63,17 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "school.wsgi.application"
+
+
+
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = config('MAIL_HOST', default='smtp.gmail.com')
+EMAIL_PORT = config('MAIL_PORT', default=587, cast=int)
+EMAIL_USE_TLS = config('MAIL_ENCRYPTION', default='tls') == 'tls'
+EMAIL_HOST_USER = config('MAIL_USERNAME', default='your-email@gmail.com')
+EMAIL_HOST_PASSWORD = config('MAIL_PASSWORD', default='your-password')
+DEFAULT_FROM_EMAIL = config('MAIL_FROM_ADDRESS', default='your-email@gmail.com')
 
 
 # Database
